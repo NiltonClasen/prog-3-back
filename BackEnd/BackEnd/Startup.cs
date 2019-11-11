@@ -27,9 +27,11 @@ namespace BackEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ObraContext>(opt =>
-               opt.UseInMemoryDatabase("Back"));
+            var connection = @"Server=(localdb)\mssqllocaldb;Database=BackEnd;
+Trusted_Connection=True;";
+            services.AddDbContext<BackContext>(opt => opt.UseSqlServer(connection));
             services.AddControllers();
+            //services.AddMvc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

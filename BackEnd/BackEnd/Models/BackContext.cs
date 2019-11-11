@@ -7,13 +7,15 @@ using BackEnd.Models;
 
 namespace BackEnd.Models
 {
-    public class ObraContext : DbContext
+    public class BackContext : DbContext
     {
-        public ObraContext(DbContextOptions<ObraContext> options)
+        public BackContext(DbContextOptions<BackContext> options)
             : base(options)
         {
         }
 
         public DbSet<Obra> Obras { get; set; }
+        public DbSet<Instituicao> Instituicao { get; set; }
+
     }
 }

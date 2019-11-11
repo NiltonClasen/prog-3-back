@@ -9,52 +9,50 @@ using BackEnd.Models;
 
 namespace BackEnd.Controllers
 {
-    [Route("RestAPIPesquisa/[controller]")]
+    [Route("RestAPIPesquisa/instituicao")]
     [ApiController]
-    public class ObrasController : ControllerBase
+    public class InstituicaoController : ControllerBase
     {
         private readonly BackContext _context;
 
-        public ObrasController(BackContext context)
+        public InstituicaoController(BackContext context)
         {
             _context = context;
         }
 
-        // GET: RestAPIPesquisa/obras
+        // GET: api/Instituicao
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Obra>>> GetObras()
+        public async Task<ActionResult<IEnumerable<Instituicao>>> GetInstituicao()
         {
-            return await _context.Obras.ToListAsync();
+            return await _context.Instituicao.ToListAsync();
         }
 
-        // GET: RestAPIPesquisa/obras/5
+        // GET: api/Instituicao/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Obra>> GetObra(long id_p)
+        public async Task<ActionResult<Instituicao>> GetInstituicao(long id)
         {
-            int id = Convert.ToInt32(id_p);
-            var obra = await _context.Obras.FindAsync(id);
+            var Instituicao = await _context.Instituicao.FindAsync(id);
 
-            if (obra == null)
+            if (Instituicao == null)
             {
                 return NotFound();
             }
 
-            return obra;
+            return Instituicao;
         }
 
-        // PUT: RestAPIPesquisa/obras/5
+        // PUT: api/Instituicao/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutObra(string id_p, Obra obra)
+        public async Task<IActionResult> PutInstituicao(string id, Instituicao Instituicao)
         {
-            int id = Convert.ToInt32(id_p);
-            if (id != obra.id)
+            if (id != Instituicao.id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(obra).State = EntityState.Modified;
+            _context.Entry(Instituicao).State = EntityState.Modified;
 
             try
             {
@@ -62,7 +60,7 @@ namespace BackEnd.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ObraExists(id))
+                if (!InstituicaoExists(id))
                 {
                     return NotFound();
                 }
@@ -75,38 +73,37 @@ namespace BackEnd.Controllers
             return NoContent();
         }
 
-        // POST: RestAPIPesquisa/obras
+        // POST: api/Instituicao
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<Obra>> PostObra(Obra obra)
+        public async Task<ActionResult<Instituicao>> PostInstituicao(Instituicao Instituicao)
         {
-            _context.Obras.Add(obra);
+            _context.Instituicao.Add(Instituicao);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetObra", new { id = obra.id }, obra);
+            return CreatedAtAction("GetInstituicao", new { id = Instituicao.id }, Instituicao);
         }
 
-        // DELETE: RestAPIPesquisa/obras/5
+        // DELETE: api/Instituicao/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Obra>> DeleteObra(String id_p)
+        public async Task<ActionResult<Instituicao>> DeleteInstituicao(String id)
         {
-            int id = Convert.ToInt32(id_p);
-            var obra = await _context.Obras.FindAsync(id);
-            if (obra == null)
+            var Instituicao = await _context.Instituicao.FindAsync(id);
+            if (Instituicao == null)
             {
                 return NotFound();
             }
 
-            _context.Obras.Remove(obra);
+            _context.Instituicao.Remove(Instituicao);
             await _context.SaveChangesAsync();
 
-            return obra;
+            return Instituicao;
         }
 
-        private bool ObraExists(int id)
+        private bool InstituicaoExists(string id)
         {
-            return _context.Obras.Any(e => e.id == id);
+            return _context.Instituicao.Any(e => e.id == id);
         }
     }
 }
