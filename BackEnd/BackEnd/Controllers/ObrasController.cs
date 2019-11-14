@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -22,16 +23,18 @@ namespace BackEnd.Controllers
 
         // GET: RestAPIPesquisa/obras
         [HttpGet]
+
         public async Task<ActionResult<IEnumerable<Obra>>> GetObras()
         {
             return await _context.Obras.ToListAsync();
         }
 
         // GET: RestAPIPesquisa/obras/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Obra>> GetObra(long id_p)
+        [HttpGet("/RestAPIPesquisa/obras/{id}")]
+
+        public async Task<ActionResult<Obra>> GetObra(int id)
         {
-            int id = Convert.ToInt32(id_p);
+            //int id = Convert.ToInt32(id_p);
             var obra = await _context.Obras.FindAsync(id);
 
             if (obra == null)
@@ -46,9 +49,9 @@ namespace BackEnd.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutObra(string id_p, Obra obra)
+
+        public async Task<IActionResult> PutObra(int id, Obra obra)
         {
-            int id = Convert.ToInt32(id_p);
             if (id != obra.id)
             {
                 return BadRequest();
@@ -79,6 +82,7 @@ namespace BackEnd.Controllers
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
+
         public async Task<ActionResult<Obra>> PostObra(Obra obra)
         {
             _context.Obras.Add(obra);
@@ -89,10 +93,27 @@ namespace BackEnd.Controllers
 
         // DELETE: RestAPIPesquisa/obras/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Obra>> DeleteObra(String id_p)
+
+        public async Task<ActionResult<Obra>> DeleteObra(int id)
         {
-            int id = Convert.ToInt32(id_p);
             var obra = await _context.Obras.FindAsync(id);
+            if (obra == null)
+            {
+                return NotFound();
+            }
+
+            _context.Obras.Remove(obra);
+            await _context.SaveChangesAsync();
+
+            return obra;
+        }
+
+        // DELETE: RestAPIPesquisa/obras/5
+        [HttpDelete]
+
+        public async Task<ActionResult<Obra>> DeleteObra([FromBody] String titulo)
+        {
+            var obra = await _context.Obras.FindAsync(titulo);
             if (obra == null)
             {
                 return NotFound();

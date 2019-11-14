@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BackEnd.Controllers
 {
@@ -24,6 +25,13 @@ namespace BackEnd.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instituicao>>> GetInstituicao()
         {
+            /*var service = new User();
+            var user = service.Authenticate();
+
+            if (user == null)
+                return BadRequest(new { message = "Usuário ou senha inválidos" });
+
+            return Ok(user);*/
             return await _context.Instituicao.ToListAsync();
         }
 
