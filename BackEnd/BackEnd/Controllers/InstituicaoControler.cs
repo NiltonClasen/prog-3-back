@@ -25,19 +25,12 @@ namespace BackEnd.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instituicao>>> GetInstituicao()
         {
-            /*var service = new User();
-            var user = service.Authenticate();
-
-            if (user == null)
-                return BadRequest(new { message = "Usuário ou senha inválidos" });
-
-            return Ok(user);*/
             return await _context.Instituicao.ToListAsync();
         }
 
         // GET: api/Instituicao/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Instituicao>> GetInstituicao(long id)
+        public async Task<ActionResult<Instituicao>> GetInstituicao(int id)
         {
             var Instituicao = await _context.Instituicao.FindAsync(id);
 
@@ -49,36 +42,42 @@ namespace BackEnd.Controllers
             return Instituicao;
         }
 
+        // GET: api/Instituicao
+        [HttpGet("getObras/{id}")]
+        public async Task<ActionResult<IEnumerable<Obra>>> GetInstituicaoObras(int id)
+        {
+            return _context.Obras.FromSqlRaw("select * from Obras where cd_instituicao = {0}", id).ToList();
+        }
+
+
         // PUT: api/Instituicao/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutInstituicao(string id, Instituicao Instituicao)
+        public async Task<ActionResult<Instituicao>> PutInstituicao(int id, Instituicao instituicao_p)
         {
-            if (id != Instituicao.id)
+            if (!InstituicaoExists(id))
             {
-                return BadRequest();
+                return NotFound();
             }
+            var instituicao = _context.Instituicao.FirstOrDefault(item => item.id == id);
 
-            _context.Entry(Instituicao).State = EntityState.Modified;
+            if (instituicao_p.nome != null) { instituicao.nome = instituicao_p.nome; };
+            if (instituicao_p.entidade != null) { instituicao.entidade = instituicao_p.entidade; };
+           
 
             try
             {
+                _context.Instituicao.Update(instituicao);
                 await _context.SaveChangesAsync();
+
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception e)
             {
-                if (!InstituicaoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
-            return NoContent();
+            return instituicao;
         }
 
         // POST: api/Instituicao
@@ -95,7 +94,7 @@ namespace BackEnd.Controllers
 
         // DELETE: api/Instituicao/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Instituicao>> DeleteInstituicao(String id)
+        public async Task<ActionResult<Instituicao>> DeleteInstituicao(int id)
         {
             var Instituicao = await _context.Instituicao.FindAsync(id);
             if (Instituicao == null)
@@ -106,10 +105,10 @@ namespace BackEnd.Controllers
             _context.Instituicao.Remove(Instituicao);
             await _context.SaveChangesAsync();
 
-            return Instituicao;
+            return Ok("Sucesso! \n"+Instituicao.nome+ ", instituição removida.");
         }
 
-        private bool InstituicaoExists(string id)
+        private bool InstituicaoExists(int id)
         {
             return _context.Instituicao.Any(e => e.id == id);
         }

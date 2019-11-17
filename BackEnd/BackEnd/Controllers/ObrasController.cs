@@ -29,12 +29,11 @@ namespace BackEnd.Controllers
             return await _context.Obras.ToListAsync();
         }
 
-        // GET: RestAPIPesquisa/obras/5
+        // GET: RestAPIPesquisa/obras/%id%
         [HttpGet("/RestAPIPesquisa/obras/{id}")]
 
         public async Task<ActionResult<Obra>> GetObra(int id)
         {
-            //int id = Convert.ToInt32(id_p);
             var obra = await _context.Obras.FindAsync(id);
 
             if (obra == null)
@@ -50,32 +49,38 @@ namespace BackEnd.Controllers
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPut("{id}")]
 
-        public async Task<IActionResult> PutObra(int id, Obra obra)
+        public async Task<ActionResult<Obra>> PutObra(int id, Obra obra_p)
         {
-            if (id != obra.id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(obra).State = EntityState.Modified;
+            if (!ObraExists(id))
+            {
+                return NotFound();
+            }
+            var obra = _context.Obras.FirstOrDefault(item => item.id == id);
+
+            if (obra_p.autor != null) { obra.autor = obra_p.autor; };
+            if (obra_p.titulo != null) { obra.titulo = obra_p.titulo; };
+            if (obra_p.ano != null) { obra.ano = obra_p.ano; };
+            if (obra_p.edicao != null) { obra.edicao = obra_p.edicao; };
+            if (obra_p.local != null) { obra.local = obra_p.local; };
+            if (obra_p.editora != null) { obra.editora = obra_p.editora; };
+            if (obra_p.paginas != null) { obra.paginas = obra_p.paginas; };
+            if (obra_p.isbn != null) { obra.isbn = obra_p.isbn; };
+            if (obra_p.issn != null) { obra.issn = obra_p.issn; };
+            if (obra_p.cd_instituicao != 0) { obra.cd_instituicao = obra_p.cd_instituicao; };
 
             try
             {
+                _context.Obras.Update(obra);
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+
+            }catch(Exception e)
             {
-                if (!ObraExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
-            return NoContent();
+            return obra;
+
         }
 
         // POST: RestAPIPesquisa/obras
@@ -85,6 +90,7 @@ namespace BackEnd.Controllers
 
         public async Task<ActionResult<Obra>> PostObra(Obra obra)
         {
+            if(obra.cd_instituicao == 0) { obra.cd_instituicao = 1; };
             _context.Obras.Add(obra);
             await _context.SaveChangesAsync();
 
@@ -94,35 +100,40 @@ namespace BackEnd.Controllers
         // DELETE: RestAPIPesquisa/obras/5
         [HttpDelete("{id}")]
 
-        public async Task<ActionResult<Obra>> DeleteObra(int id)
+        public String DeleteObra(int id)
         {
-            var obra = await _context.Obras.FindAsync(id);
+            var obra = _context.Obras.Find(id);
             if (obra == null)
             {
-                return NotFound();
+                return "Nenhuma obra com o id " + id + " foi encontrada";
             }
 
             _context.Obras.Remove(obra);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
-            return obra;
+            return "Sucess \nObra removida "+ obra.titulo;
         }
 
         // DELETE: RestAPIPesquisa/obras/5
-        [HttpDelete]
+        [HttpDelete("/RestAPIPesquisa/obras")]
 
-        public async Task<ActionResult<Obra>> DeleteObra([FromBody] String titulo)
+        public String DeleteObra([FromBody] Obra obra_p)
         {
-            var obra = await _context.Obras.FindAsync(titulo);
-            if (obra == null)
+            
+            if (!_context.Obras.Any(e => e.titulo == obra_p.titulo))
             {
-                return NotFound();
+                return "nenhuma obra com o nome " + obra_p.titulo + " foi encontrada";
+            }
+            var aux = _context.Obras.Where(teste => teste.titulo == obra_p.titulo);
+
+            foreach(var obra_del in aux)
+            {
+                _context.Obras.Remove(obra_del);
             }
 
-            _context.Obras.Remove(obra);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
-            return obra;
+            return "obra(s) com o titulo " + obra_p.titulo + " removida(s)";
         }
 
         private bool ObraExists(int id)

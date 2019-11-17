@@ -6,11 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using BackEnd.Models;
+using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.PlatformAbstractions;
+using System.IO;
 
 namespace BackEnd
 {
@@ -50,6 +53,23 @@ namespace BackEnd
             services.AddDbContext<BackContext>(opt => opt.UseSqlServer(connection));
             services.AddControllers();
             services.AddMvc();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "testing",
+                    Version = "v1"
+                });
+
+                string caminhoAplicacao =
+                    PlatformServices.Default.Application.ApplicationBasePath;
+                string nomeAplicacao =
+                    PlatformServices.Default.Application.ApplicationName;
+                string caminhoXmlDoc =
+                    Path.Combine(caminhoAplicacao, $"{nomeAplicacao}.xml");
+
+                c.IncludeXmlComments(caminhoXmlDoc);
+            });
             /*services.AddMvc(config =>
             {
                 var policy = new AuthorizationPolicyBuilder()
@@ -76,6 +96,13 @@ namespace BackEnd
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json",
+                    "BackEnd");
+            });
+
             app.UseRouting();
 
             app.UseAuthorization();
@@ -84,6 +111,7 @@ namespace BackEnd
             {
                 endpoints.MapControllers();
             });
+
         }
     }
 }
