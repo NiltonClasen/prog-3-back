@@ -22,6 +22,11 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/Instituicao
+        ///<summary>
+        ///deleta a obra de acordo com o ip
+        /// </summary>
+        /// <returns>A obra foi deletada</returns>
+        /// <response code="200">A obra foi deletada.</response>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Instituicao>>> GetInstituicao()
         {
@@ -29,6 +34,11 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/Instituicao/5
+        ///<summary>
+        ///Lista a Instituicao de acordo com o id.
+        /// </summary>
+        /// <returns>A Instituicao</returns>
+        /// <response code="200">Lista a Instituicao de acordo com o id.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<Instituicao>> GetInstituicao(int id)
         {
@@ -43,6 +53,11 @@ namespace BackEnd.Controllers
         }
 
         // GET: api/Instituicao
+        ///<summary>
+        ///Lista as obras de acordo com o id da instituição passada.
+        /// </summary>
+        /// <returns>A(s) obras(s)</returns>
+        /// <response code="200">Lista a(s) obra(s) de acordo com o id da instituição.</response>
         [HttpGet("getObras/{id}")]
         public async Task<ActionResult<IEnumerable<Obra>>> GetInstituicaoObras(int id)
         {
@@ -51,8 +66,11 @@ namespace BackEnd.Controllers
 
 
         // PUT: api/Instituicao/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        ///<summary>
+        ///Atualiza o registro de obra de acordo com as informações passadas
+        /// </summary>
+        /// <returns>A Instituicao atualizada</returns>
+        /// <response code="200">A Instituicao atualizada.</response>
         [HttpPut("{id}")]
         public async Task<ActionResult<Instituicao>> PutInstituicao(int id, Instituicao instituicao_p)
         {
@@ -81,8 +99,11 @@ namespace BackEnd.Controllers
         }
 
         // POST: api/Instituicao
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        ///<summary>
+        ///Salva o registro no banco de dados
+        /// </summary>
+        /// <returns>A Instituicao foi salva</returns>
+        /// <response code="200">A Instituicao foi salva.</response>
         [HttpPost]
         public async Task<ActionResult<Instituicao>> PostInstituicao(Instituicao Instituicao)
         {
@@ -93,6 +114,11 @@ namespace BackEnd.Controllers
         }
 
         // DELETE: api/Instituicao/5
+        ///<summary>
+        ///deleta a Instituição de acordo com o ip
+        /// </summary>
+        /// <returns>A Instituição foi deletada</returns>
+        /// <response code="200">A Instituição foi deletada.</response>
         [HttpDelete("{id}")]
         public async Task<ActionResult<Instituicao>> DeleteInstituicao(int id)
         {

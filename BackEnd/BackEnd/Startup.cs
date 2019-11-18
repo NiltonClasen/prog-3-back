@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.PlatformAbstractions;
 using System.IO;
+using System.Reflection;
+using System;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace BackEnd
 {
@@ -53,38 +56,41 @@ namespace BackEnd
             services.AddDbContext<BackContext>(opt => opt.UseSqlServer(connection));
             services.AddControllers();
             services.AddMvc();
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "testing",
-                    Version = "v1"
-                });
-
-                string caminhoAplicacao =
-                    PlatformServices.Default.Application.ApplicationBasePath;
-                string nomeAplicacao =
-                    PlatformServices.Default.Application.ApplicationName;
-                string caminhoXmlDoc =
-                    Path.Combine(caminhoAplicacao, $"{nomeAplicacao}.xml");
-
-                c.IncludeXmlComments(caminhoXmlDoc);
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoAPI", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
             });
-            /*services.AddMvc(config =>
+        
+        /*services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("user", policy => policy.RequireClaim("Store", "user"));
-                options.AddPolicy("admin", policy => policy.RequireClaim("Store", "admin"));
+                Title = "testing",
+                Version = "v1"
             });
-            */
-        }
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
+        });*/
+        /*services.AddMvc(config =>
+        {
+            var policy = new AuthorizationPolicyBuilder()
+                             .RequireAuthenticatedUser()
+                             .Build();
+            config.Filters.Add(new AuthorizeFilter(policy));
+        }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("user", policy => policy.RequireClaim("Store", "user"));
+            options.AddPolicy("admin", policy => policy.RequireClaim("Store", "admin"));
+        });
+        */
+    }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -97,10 +103,10 @@ namespace BackEnd
             app.UseHttpsRedirection();
 
             app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            app.UseSwaggerUI(opt =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json",
-                    "BackEnd");
+                opt.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoAPI V1");
+                opt.RoutePrefix = string.Empty;
             });
 
             app.UseRouting();

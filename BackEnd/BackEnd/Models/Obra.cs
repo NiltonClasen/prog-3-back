@@ -27,7 +27,6 @@ namespace BackEnd.Models
         public string isbn { get; set; }
         [StringLength(100)]
         public string issn { get; set; }
-        //[Range(0, int.MaxValue, ErrorMessage = "Please enter valid integer Number")]
         public int cd_instituicao { get; set; }
     }
 }

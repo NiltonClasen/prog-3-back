@@ -21,15 +21,24 @@ namespace BackEnd.Controllers
             _context = context;
         }
 
-        // GET: RestAPIPesquisa/obras
+        /// GET: RestAPIPesquisa/obras
+        ///<summary>
+        ///Lista todas as obras.
+        /// </summary>
+        /// <returns>As obras</returns>
+        /// <response code="200">Lista todas as obras cadastradas</response>
         [HttpGet]
-
         public async Task<ActionResult<IEnumerable<Obra>>> GetObras()
         {
             return await _context.Obras.ToListAsync();
         }
 
         // GET: RestAPIPesquisa/obras/%id%
+        ///<summary>
+        ///Lista a obra de acordo com o id.
+        /// </summary>
+        /// <returns>A obra</returns>
+        /// <response code="200">Lista a obra de acordo com o id.</response>
         [HttpGet("/RestAPIPesquisa/obras/{id}")]
 
         public async Task<ActionResult<Obra>> GetObra(int id)
@@ -45,8 +54,11 @@ namespace BackEnd.Controllers
         }
 
         // PUT: RestAPIPesquisa/obras/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        ///<summary>
+        ///Atualiza o registro de obra de acordo com as informações passadas
+        /// </summary>
+        /// <returns>A obra atualizada</returns>
+        /// <response code="200">A obra atualizada.</response>
         [HttpPut("{id}")]
 
         public async Task<ActionResult<Obra>> PutObra(int id, Obra obra_p)
@@ -74,7 +86,8 @@ namespace BackEnd.Controllers
                 _context.Obras.Update(obra);
                 await _context.SaveChangesAsync();
 
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return NotFound();
             }
@@ -84,13 +97,16 @@ namespace BackEnd.Controllers
         }
 
         // POST: RestAPIPesquisa/obras
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for
-        // more details see https://aka.ms/RazorPagesCRUD.
+        ///<summary>
+        ///Salva o registro no banco de dados
+        /// </summary>
+        /// <returns>A obra foi salva</returns>
+        /// <response code="200">A obra foi salva.</response>
         [HttpPost]
 
         public async Task<ActionResult<Obra>> PostObra(Obra obra)
         {
-            if(obra.cd_instituicao == 0) { obra.cd_instituicao = 1; };
+            if (obra.cd_instituicao == 0) { obra.cd_instituicao = 1; };
             _context.Obras.Add(obra);
             await _context.SaveChangesAsync();
 
@@ -98,6 +114,11 @@ namespace BackEnd.Controllers
         }
 
         // DELETE: RestAPIPesquisa/obras/5
+        ///<summary>
+        ///deleta a obra de acordo com o ip
+        /// </summary>
+        /// <returns>A obra foi deletada</returns>
+        /// <response code="200">A obra foi deletada.</response>
         [HttpDelete("{id}")]
 
         public String DeleteObra(int id)
@@ -111,22 +132,27 @@ namespace BackEnd.Controllers
             _context.Obras.Remove(obra);
             _context.SaveChanges();
 
-            return "Sucess \nObra removida "+ obra.titulo;
+            return "Sucess \nObra removida " + obra.titulo;
         }
 
         // DELETE: RestAPIPesquisa/obras/5
+        ///<summary>
+        ///deleta a obra de acordo com o argumento passado como parâmetro
+        /// </summary>
+        /// <returns>A(s) obra(s) foi/foram deletada(s)</returns>
+        /// <response code="200">A(s) obra(s) foi/foram deletada(s)</response>
         [HttpDelete("/RestAPIPesquisa/obras")]
 
         public String DeleteObra([FromBody] Obra obra_p)
         {
-            
+
             if (!_context.Obras.Any(e => e.titulo == obra_p.titulo))
             {
                 return "nenhuma obra com o nome " + obra_p.titulo + " foi encontrada";
             }
             var aux = _context.Obras.Where(teste => teste.titulo == obra_p.titulo);
 
-            foreach(var obra_del in aux)
+            foreach (var obra_del in aux)
             {
                 _context.Obras.Remove(obra_del);
             }
