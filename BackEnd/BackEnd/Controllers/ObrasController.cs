@@ -12,6 +12,7 @@ namespace BackEnd.Controllers
 {
     [Route("RestAPIPesquisa/[controller]")]
     [ApiController]
+    [Authorize]
     public class ObrasController : ControllerBase
     {
         private readonly BackContext _context;
@@ -63,23 +64,23 @@ namespace BackEnd.Controllers
 
         public async Task<ActionResult<Obra>> PutObra(int id, Obra obra_p)
         {
-
+            var aux = 0;
             if (!ObraExists(id))
             {
                 return NotFound();
             }
             var obra = _context.Obras.FirstOrDefault(item => item.id == id);
 
-            if (obra_p.autor != null) { obra.autor = obra_p.autor; };
-            if (obra_p.titulo != null) { obra.titulo = obra_p.titulo; };
-            if (obra_p.ano != null) { obra.ano = obra_p.ano; };
-            if (obra_p.edicao != null) { obra.edicao = obra_p.edicao; };
-            if (obra_p.local != null) { obra.local = obra_p.local; };
-            if (obra_p.editora != null) { obra.editora = obra_p.editora; };
-            if (obra_p.paginas != null) { obra.paginas = obra_p.paginas; };
-            if (obra_p.isbn != null) { obra.isbn = obra_p.isbn; };
-            if (obra_p.issn != null) { obra.issn = obra_p.issn; };
-            if (obra_p.cd_instituicao != 0) { obra.cd_instituicao = obra_p.cd_instituicao; };
+            if (obra_p.autor != null) { obra.autor = obra_p.autor;  aux++; };
+            if (obra_p.titulo != null) { obra.titulo = obra_p.titulo; aux++; };
+            if (obra_p.ano != null) { obra.ano = obra_p.ano; aux++; };
+            if (obra_p.edicao != null) { obra.edicao = obra_p.edicao; aux++; };
+            if (obra_p.local != null) { obra.local = obra_p.local; aux++; };
+            if (obra_p.editora != null) { obra.editora = obra_p.editora; aux++; };
+            if (obra_p.paginas != null) { obra.paginas = obra_p.paginas; aux++; };
+            if (obra_p.isbn != null) { obra.isbn = obra_p.isbn; aux++; };
+            if (obra_p.issn != null) { obra.issn = obra_p.issn; aux++; };
+            if (obra_p.cd_instituicao != 0) { obra.cd_instituicao = obra_p.cd_instituicao; aux++; };
 
             try
             {
@@ -91,8 +92,15 @@ namespace BackEnd.Controllers
             {
                 return NotFound();
             }
-
+            if(aux > 0)
+            {
+                return NotFound("Parâmetros passados de forma incorreta.");
+            }
+            else
+            {
             return obra;
+
+            }
 
         }
 
@@ -121,18 +129,18 @@ namespace BackEnd.Controllers
         /// <response code="200">A obra foi deletada.</response>
         [HttpDelete("{id}")]
 
-        public String DeleteObra(int id)
+        public async Task<ActionResult<Obra>> DeleteObra(int id)
         {
             var obra = _context.Obras.Find(id);
             if (obra == null)
             {
-                return "Nenhuma obra com o id " + id + " foi encontrada";
+                return NotFound("Nenhuma obra com o id " + id + " foi encontrada");
             }
 
             _context.Obras.Remove(obra);
-            _context.SaveChanges();
+            _context.SaveChangesAsync();
 
-            return "Sucess \nObra removida " + obra.titulo;
+            return Ok("Sucess \nObra removida " + obra.titulo);
         }
 
         // DELETE: RestAPIPesquisa/obras/5
@@ -143,12 +151,12 @@ namespace BackEnd.Controllers
         /// <response code="200">A(s) obra(s) foi/foram deletada(s)</response>
         [HttpDelete("/RestAPIPesquisa/obras")]
 
-        public String DeleteObra([FromBody] Obra obra_p)
+        public async Task<ActionResult<Obra>> DeleteObra([FromBody] Obra obra_p)
         {
 
             if (!_context.Obras.Any(e => e.titulo == obra_p.titulo))
             {
-                return "nenhuma obra com o nome " + obra_p.titulo + " foi encontrada";
+                return NotFound("nenhuma obra com o nome " + obra_p.titulo + " foi encontrada");
             }
             var aux = _context.Obras.Where(teste => teste.titulo == obra_p.titulo);
 
@@ -159,7 +167,7 @@ namespace BackEnd.Controllers
 
             _context.SaveChanges();
 
-            return "obra(s) com o titulo " + obra_p.titulo + " removida(s)";
+            return Ok("obra(s) com o titulo " + obra_p.titulo + " removida(s)");
         }
 
         private bool ObraExists(int id)

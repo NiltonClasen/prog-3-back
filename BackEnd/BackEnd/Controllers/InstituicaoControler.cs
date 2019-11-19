@@ -12,6 +12,7 @@ namespace BackEnd.Controllers
 {
     [Route("RestAPIPesquisa/instituicao")]
     [ApiController]
+    [Authorize]
     public class InstituicaoController : ControllerBase
     {
         private readonly BackContext _context;
@@ -74,15 +75,16 @@ namespace BackEnd.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Instituicao>> PutInstituicao(int id, Instituicao instituicao_p)
         {
+            var aux = 0;
             if (!InstituicaoExists(id))
             {
                 return NotFound();
             }
             var instituicao = _context.Instituicao.FirstOrDefault(item => item.id == id);
 
-            if (instituicao_p.nome != null) { instituicao.nome = instituicao_p.nome; };
-            if (instituicao_p.entidade != null) { instituicao.entidade = instituicao_p.entidade; };
-           
+            if (instituicao_p.nome != null) { instituicao.nome = instituicao_p.nome; aux++; };
+            if (instituicao_p.entidade != null) { instituicao.entidade = instituicao_p.entidade; aux++; };
+
 
             try
             {
@@ -94,8 +96,15 @@ namespace BackEnd.Controllers
             {
                 return NotFound();
             }
+            if (aux > 0)
+            {
+                return NotFound("Parâmetros passados de forma incorreta.");
+            }
+            else
+            {
+                return instituicao;
 
-            return instituicao;
+            }
         }
 
         // POST: api/Instituicao
@@ -128,10 +137,18 @@ namespace BackEnd.Controllers
                 return NotFound();
             }
 
-            _context.Instituicao.Remove(Instituicao);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Instituicao.Remove(Instituicao);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return NotFound("Não é possível excluir uma instituição que possui obras associadas");
+            }
 
-            return Ok("Sucesso! \n"+Instituicao.nome+ ", instituição removida.");
+
+            return Ok("Sucesso! \n" + Instituicao.nome + ", instituição removida.");
         }
 
         private bool InstituicaoExists(int id)

@@ -31,25 +31,7 @@ namespace BackEnd
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
-        {   /*
-            var key = Encoding.ASCII.GetBytes(Settings.Secret);
-
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(x =>
-            {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });*/
+        {   
 
 
             string connection = @"Server=(localdb)\mssqllocaldb;Database=BackEnd;Trusted_Connection=True;";
@@ -64,33 +46,31 @@ namespace BackEnd
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-        
-        /*services.AddSwaggerGen(c =>
-        {
-            c.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "testing",
-                Version = "v1"
-            });
-            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-            c.IncludeXmlComments(xmlPath);
-        });*/
-        /*services.AddMvc(config =>
-        {
-            var policy = new AuthorizationPolicyBuilder()
-                             .RequireAuthenticatedUser()
-                             .Build();
-            config.Filters.Add(new AuthorizeFilter(policy));
-        }).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy("user", policy => policy.RequireClaim("Store", "user"));
-            options.AddPolicy("admin", policy => policy.RequireClaim("Store", "admin"));
-        });
-        */
-    }
+            services.AddCors(o => o.AddPolicy("Allow", builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            }));
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateLifetime = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["Issuer"],
+                    ValidAudience = Configuration["Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["SecurityKey"]))
+                };
+
+            });
+
+
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -109,7 +89,11 @@ namespace BackEnd
                 opt.RoutePrefix = string.Empty;
             });
 
+            app.UseCors("Allow");
+
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
